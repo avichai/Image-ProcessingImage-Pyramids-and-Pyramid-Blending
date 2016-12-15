@@ -5,6 +5,7 @@ def testGaussPyr():
     im = sol3.read_image('external/jerusalem.jpg', 1)
     sol3.imdisplay('external/jerusalem.jpg', 1)
     # pyr, filter_vec = sol3.build_gaussian_pyramid(im, max_levels, filter_size)
+    # pyr, filter_vec = build_laplacian_pyramid(im, max_levels, filter_size)
 
 
 
