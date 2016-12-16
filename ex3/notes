@@ -1,0 +1,5 @@
+1. why do we need to stretch the images to [0,1]?
+2. do we need to use plt.show(block=True) or just let it pass?
+3. how to save a image as binary???
+4. remember to find awesome images to blend! and maybe a better way
+    to create the mask

@@ -36,11 +36,11 @@ def testLapPyr():
 def testReconstract():
     NUM_PIC = 7
     # im = sol3.read_image('external/jerusalem.jpg', 1)
-    im = sol3.read_image('external/monkey.jpg', 1)
-    # im = sol3.read_image('external/LowContrast.jpg', 1)
+    # im = sol3.read_image('external/monkey.jpg', 1)
+    im = sol3.read_image('external/LowContrast.jpg', 1)
     im = im[:2 ** (np.uint(np.floor(np.log2(im.shape[0])))),
          :2 ** (np.uint(np.floor(np.log2(im.shape[1]))))]
-    lpyr, filter_vec = sol3.build_laplacian_pyramid(im, NUM_PIC, 11)
+    lpyr, filter_vec = sol3.build_laplacian_pyramid(im, NUM_PIC, 7)
     img = sol3.laplacian_to_image(lpyr, filter_vec, [1, 1, 1, 1, 1])
 
     plt.figure()
@@ -84,16 +84,45 @@ def testDispPyr():
     sol3.display_pyramid(pyrl, 10)
 
 
+def testBlend():
+    max_levels = 3
+    filter_size_im = 1
+    filter_size_mask = 1
+    mask32 = sol3.read_image('external/bonus/1Bool.jpg', 1)
+    mask = mask32.astype(np.bool)
+    im1 = sol3.read_image('external/bonus/1.jpg', 1)
+    im2 = sol3.read_image('external/bonus/2.jpg', 1)
+    im_blend = sol3.pyramid_blending(im1, im2, mask, max_levels, filter_size_im,
+                                     filter_size_mask)
+
+    plt.figure()
+    plt.imshow(im_blend, cmap=plt.cm.gray)
+    plt.show(block=True)
+
+
+def testBlendExample():
+    im1, im2, mask, im_blend = sol3.blending_example1()
+    im3, im4, mask1, im_blend1 = sol3.blending_example2()
+    plt.figure()
+    plt.imshow(im_blend)
+    plt.figure()
+    plt.imshow(im_blend1)
+    plt.show(block=True)
+
+
 # tests:
 # testGaussPyr
 # testLapPyr
 # testReconstract
 # testRenderPyr
 # testDispPyr
+# testBlend
+# testBlendExample
+
 
 def main():
     try:
-        for test in [testDispPyr]:
+        for test in [testBlendExample]:
             test()
     except Exception as e:
         print("Failed test due to: {0}".format(e))

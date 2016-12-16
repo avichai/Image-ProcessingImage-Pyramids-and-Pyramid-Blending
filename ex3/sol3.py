@@ -15,16 +15,7 @@ NORM_PIX_FACTOR = 255
 ROWS = 0
 COLS = 1
 LARGEST_IM_INDEX = 0
-
-
-
-# todo not in use for noe
-
-IMAGE_DIM = 2
-DER_VEC = [1, 0, -1]
 DIM_RGB = 3
-MAX_PIX_VALUE = 256
-MIN_PIX_VALUE = 0
 
 
 def read_image(filename, representation):
@@ -45,6 +36,9 @@ def read_image(filename, representation):
         return
     if representation == GRAY:
         im = rgb2gray(im).astype(np.float32)
+        if np.max(im) > 1:
+            '''not suppose to happened'''
+            im /= NORM_PIX_FACTOR
         return im
     im = im.astype(np.float32)
     im /= NORM_PIX_FACTOR
@@ -130,8 +124,7 @@ def getNumInInPyr(im, max_levels):
     :param max_levels: an initial limitation
     :return: the real limitation
     '''
-    numRows = im.shape[ROWS]
-    numCols = im.shape[COLS]
+    numRows, numCols = im.shape[ROWS], im.shape[COLS]
 
     limRows = np.floor(np.log2(numRows)) - 3
     limCols = np.floor(np.log2(numCols)) - 3
@@ -176,7 +169,7 @@ def build_laplacian_pyramid(im, max_levels, filter_size):
 
     for i in range(numImInPyr - 1):
         laplacianPyr.append(gaussPyr[i] - expandIm(
-            gaussPyr[i + 1], 2 * gaussFilter, filter_size))
+            gaussPyr[i + 1], np.multiply(2, gaussFilter), filter_size))
     laplacianPyr.append(gaussPyr[numImInPyr - 1])
     return laplacianPyr, gaussFilter
 
@@ -190,14 +183,13 @@ def laplacian_to_image(lpyr, filter_vec, coeff):
     :param coeff: the coefficient of each image in the pyramid
     :return: reconstruction of an image from its Laplacian Pyramid
     '''
-    numIm = len(lpyr)
-    numCoe = len(coeff)
+    numIm, numCoe = len(lpyr), len(coeff)
     if numIm != numCoe:
         '''invalid input'''
         return
     gni = lpyr[numIm - 1]
     for i in range(numIm - 1):
-        gni = expandIm(gni, 2 * filter_vec, len(filter_vec)) + (
+        gni = expandIm(gni, np.multiply(2, filter_vec), len(filter_vec)) + (
             lpyr[numIm - 1 - i - 1] * coeff[len(coeff) - 1 - i])
     return gni.astype(np.float32)
 
@@ -210,8 +202,7 @@ def strechIm(im, newMin, newMax):
     :param im: float 32 image
     :return: stretched im
     """
-    inMin = np.min(im)
-    inMax = np.max(im)
+    inMin, inMax = np.min(im), np.max(im)
     stretchedIm = (im - inMin) * ((newMax - newMin) / (inMax - inMin)) + newMin
     return stretchedIm
 
@@ -251,3 +242,114 @@ def display_pyramid(pyr, levels):
     plt.figure()
     plt.imshow(res, cmap=plt.cm.gray)
     plt.show(block=True)
+
+
+def pyramid_blending(im1, im2, mask, max_levels, filter_size_im,
+                     filter_size_mask):
+    '''
+    blending images using pyramids.
+    :rtype : tuple
+    :param im1: first im to blend - grayscale
+    :param im2: second im to blend - grayscale
+    :param mask:  is a boolean (i.e. dtype == np.bool) mask containing
+        True and False representing which parts of im1 and im2 should
+        appear in the resulting im_blend.
+    :param max_levels:  is the max_levels parameter you should use when
+            generating the Gaussian and Laplacian pyramids
+    :param filter_size_im:  is the size of the Gaussian filter
+            (an odd scalar that represents a squared filter) which defining the
+            filter used in the construction of the Laplacian pyramids of
+            im1 and im2
+    :param filter_size_mask: is the size of the Gaussian filter(an odd scalar
+            that represents a squared filter) which defining the filter used
+            in the construction of the Gaussian pyramid of mask.
+    :return: blended image using laplacian and gausian pyramids.
+    '''
+    l1Pyr, filterVec1 = build_laplacian_pyramid(im1, max_levels, filter_size_im)
+    l2Pyr, filterVec2 = build_laplacian_pyramid(im2, max_levels, filter_size_im)
+    maskInFlots = mask.astype(np.float32)
+    gaussMaskPyr, filterVec3 = build_gaussian_pyramid(maskInFlots, max_levels,
+                                                      filter_size_mask)
+    lOut = []
+    lenOfPyr = len(l1Pyr)
+    for i in range(lenOfPyr):
+        lOut.append(np.multiply(gaussMaskPyr[i], l1Pyr[i]) +
+                    (np.multiply(1 - gaussMaskPyr[i], l2Pyr[i])))
+    blendedIm = laplacian_to_image(lOut, filterVec1, [1] * lenOfPyr)
+    blendedImClip = np.clip(blendedIm, 0, 1)
+    return blendedImClip
+
+
+def relpath(filename):
+    '''
+    return the real path of filename
+    :param filename: relative path name
+    :return: the real path of filename
+    '''
+    return os.path.join(os.path.dirname(__file__), filename)
+
+
+def generateFigure(im1, im2, mask, blendedIm):
+    '''
+    generate the figure with all the necessary images.
+    :param im1:
+    :param im2:
+    :param mask:
+    :param blendedIm:
+    '''
+    plt.figure()
+    plt.subplot(2, 2, 1)
+    plt.imshow(im1)
+    plt.subplot(2, 2, 2)
+    plt.imshow(im2)
+    plt.subplot(2, 2, 3)
+    plt.imshow(mask, cmap=plt.cm.gray)
+    plt.subplot(2, 2, 4)
+    plt.imshow(blendedIm)
+    plt.show(block=True)
+
+
+def doMyBlend(im1Path, im2Path, maskPath):
+    '''
+    performing RGB pyramid blending
+    :param im1Path: relative path of im1
+    :param im2Path: relative path of im2
+    :param maskPath: relative path of mask (binary image)
+    :return: im1, im2, mask, blendedIm
+    '''
+    max_levels = 5
+    filter_size_im = 5
+    filter_size_mask = 5
+    mask32 = read_image(relpath(maskPath), 1)
+    mask = mask32.astype(np.bool)
+    im1 = read_image(relpath(im1Path), 2)
+    im2 = read_image(relpath(im2Path), 2)
+
+    blendedIm = np.zeros((im1.shape[0], im1.shape[1], im1.shape[2]))
+    for i in range(DIM_RGB):
+        blendedIm[:, :, i] = pyramid_blending(im1[:, :, i], im2[:, :, 1],
+                                              mask, max_levels, filter_size_im,
+                                              filter_size_mask)
+
+    generateFigure(im1, im2, mask, blendedIm)
+    return im1, im2, mask, blendedIm
+
+
+def blending_example1():
+    '''
+    performing RGB pyramid blending
+    :return: im1, im2, mask, blendedIm
+    '''
+    return doMyBlend('external/bonus/2.jpg', 'external/bonus/1.jpg',
+                     'external/bonus/1Bool.jpg')
+    # todo change the images!!!!
+
+
+def blending_example2():
+    '''
+    performing RGB pyramid blending
+    :return: im1, im2, mask, blendedIm
+    '''
+    return doMyBlend('external/bonus/1.jpg', 'external/bonus/2.jpg',
+                     'external/bonus/1Bool.jpg')
+    # todo change the images!!!!
