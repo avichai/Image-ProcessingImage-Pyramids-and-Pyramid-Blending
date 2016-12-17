@@ -327,7 +327,7 @@ def doMyBlend(im1Path, im2Path, maskPath):
 
     blendedIm = np.zeros((im1.shape[0], im1.shape[1], im1.shape[2]))
     for i in range(DIM_RGB):
-        blendedIm[:, :, i] = pyramid_blending(im1[:, :, i], im2[:, :, 1],
+        blendedIm[:, :, i] = pyramid_blending(im1[:, :, i], im2[:, :, i],
                                               mask, max_levels, filter_size_im,
                                               filter_size_mask)
 
@@ -350,6 +350,6 @@ def blending_example2():
     performing RGB pyramid blending
     :return: im1, im2, mask, blendedIm
     '''
-    return doMyBlend('external/bonus/7b.jpg', 'external/bonus/8b.jpg',
-                     'external/bonus/8Bool.jpg')
+    return doMyBlend('external/bonus/plate.jpg', 'external/bonus/rabbit.jpg',
+                     'external/bonus/maskRabbitBool.jpg')
     # todo change the images!!!!
