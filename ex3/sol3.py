@@ -350,6 +350,6 @@ def blending_example2():
     performing RGB pyramid blending
     :return: im1, im2, mask, blendedIm
     '''
-    return doMyBlend('external/bonus/1.jpg', 'external/bonus/2.jpg',
-                     'external/bonus/1Bool.jpg')
+    return doMyBlend('external/bonus/7b.jpg', 'external/bonus/8b.jpg',
+                     'external/bonus/8Bool.jpg')
     # todo change the images!!!!
