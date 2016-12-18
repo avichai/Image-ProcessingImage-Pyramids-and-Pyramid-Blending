@@ -340,7 +340,7 @@ def blending_example1():
     :return: im1, im2, mask, blendedIm
     '''
     return doMyBlend('external/bonus/plate.jpg', 'external/bonus/rabbit.jpg',
-                     'external/bonus/maskRabbitBool.jpg')
+                     'external/bonus/maskRabbit_converted.jpg')
 
 
 def blending_example2():
@@ -349,4 +349,4 @@ def blending_example2():
     :return: im1, im2, mask, blendedIm
     '''
     return doMyBlend('external/bonus/camel.jpg', 'external/bonus/view.jpg',
-                     'external/bonus/maskCamelBool.jpg')
+                     'external/bonus/maskCamelBool_converted.jpg')
