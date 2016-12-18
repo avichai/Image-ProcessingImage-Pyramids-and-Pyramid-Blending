@@ -85,13 +85,13 @@ def testDispPyr():
 
 
 def testBlend():
-    max_levels = 3
-    filter_size_im = 1
-    filter_size_mask = 1
-    mask32 = sol3.read_image('external/bonus/1Bool.jpg', 1)
+    max_levels = 5
+    filter_size_im = 5
+    filter_size_mask = 5
+    mask32 = sol3.read_image('external/bonus/maskCamelBool.jpg', 1)
     mask = mask32.astype(np.bool)
-    im1 = sol3.read_image('external/bonus/1.jpg', 1)
-    im2 = sol3.read_image('external/bonus/2.jpg', 1)
+    im1 = sol3.read_image('external/bonus/camel.jpg', 1)
+    im2 = sol3.read_image('external/bonus/view.jpg', 1)
     im_blend = sol3.pyramid_blending(im1, im2, mask, max_levels, filter_size_im,
                                      filter_size_mask)
 
@@ -111,6 +111,7 @@ def testBlendExample():
 
 
 # tests:
+
 # testGaussPyr
 # testLapPyr
 # testReconstract

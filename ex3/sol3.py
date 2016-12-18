@@ -146,7 +146,6 @@ def build_gaussian_pyramid(im, max_levels, filter_size):
     gaussPyr = [im]
     currIm = im
 
-    # todo add braking when size of im is less than 16 pix
     for i in range(1, numImInPyr):
         currIm = reduceIm(currIm, gaussFilter, filter_size)
         gaussPyr.append(currIm)
@@ -340,9 +339,8 @@ def blending_example1():
     performing RGB pyramid blending
     :return: im1, im2, mask, blendedIm
     '''
-    return doMyBlend('external/bonus/2.jpg', 'external/bonus/1.jpg',
-                     'external/bonus/1Bool.jpg')
-    # todo change the images!!!!
+    return doMyBlend('external/bonus/plate.jpg', 'external/bonus/rabbit.jpg',
+                     'external/bonus/maskRabbitBool.jpg')
 
 
 def blending_example2():
@@ -350,6 +348,5 @@ def blending_example2():
     performing RGB pyramid blending
     :return: im1, im2, mask, blendedIm
     '''
-    return doMyBlend('external/bonus/plate.jpg', 'external/bonus/rabbit.jpg',
-                     'external/bonus/maskRabbitBool.jpg')
-    # todo change the images!!!!
+    return doMyBlend('external/bonus/camel.jpg', 'external/bonus/view.jpg',
+                     'external/bonus/maskCamelBool.jpg')
