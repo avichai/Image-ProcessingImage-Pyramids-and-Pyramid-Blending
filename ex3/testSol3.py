@@ -92,8 +92,8 @@ def testBlend():
     mask = mask32.astype(np.bool)
     im1 = sol3.read_image('external/bonus/camel.jpg', 1)
     im2 = sol3.read_image('external/bonus/view.jpg', 1)
-    im_blend = sol3.pyramid_blending(im1, im2, mask, max_levels, filter_size_im,
-                                     filter_size_mask)
+    im_blend = sol3.pyramid_blending(im1, im2, mask, max_levels,
+                                      filter_size_im, filter_size_mask)
 
     plt.figure()
     plt.imshow(im_blend, cmap=plt.cm.gray)
@@ -107,6 +107,7 @@ def testBlendExample():
     plt.imshow(im_blend)
     plt.figure()
     plt.imshow(im_blend1)
+
     plt.show(block=True)
 
 

@@ -45,22 +45,6 @@ def read_image(filename, representation):
     return im
 
 
-def imdisplay(filename, representation):
-    """this function display a given image file and in the given
-    representation:
-    filename - string containing the image filename to read.
-    representation - representation code, either 1 or 2 defining if the
-                     output should be either a grayscale image (1) or an
-                     RGB image (2)."""
-    im = read_image(filename, representation)
-    plt.figure()
-    if (representation == GRAY):
-        plt.imshow(im, cmap=plt.cm.gray)
-    else:
-        plt.imshow(im)
-    plt.show(block=True)
-
-
 def getGaussVec(kernel_size):
     '''
     gets the gaussian vector in the length of the kernel size
@@ -72,19 +56,18 @@ def getGaussVec(kernel_size):
     return sig.convolve(BINOMIAL_MAT, getGaussVec(kernel_size - 1))
 
 
-def getImAfterBlur(im, Filter, filter_size):
+def getImAfterBlur(im, filter, filter_size):
     '''
     return the image after row and col blur
     :param im: the image to blur
-    :param Filter: the filter to blur with
+    :param filter: the filter to blur with
     :return: blurred image
     '''
-    filterAsMat = np.array(Filter).reshape(1, filter_size)
     # todo choose which convolve do I prefer
     # blurXIm = convolve(im, filterAsMat, mode='reflect')
-    blurXIm = convolve(im, filterAsMat, mode='constant', cval=0.0)
+    blurXIm = convolve(im, filter, mode='constant', cval=0.0)
     # blurIm = convolve(blurXIm, filterAsMat.transpose(), mode='reflect')
-    blurIm = convolve(blurXIm, filterAsMat.transpose(),
+    blurIm = convolve(blurXIm, filter.transpose(),
                       mode='constant', cval=0.0).astype(np.float32)
     return blurIm
 
@@ -138,14 +121,13 @@ def build_gaussian_pyramid(im, max_levels, filter_size):
     :param im: a grayscale image with double values in [0, 1]
     :param max_levels: the maximal number of levels in the resulting pyramid
     :param filter_size: the size of the Gaussian filter
-    :return: Gaussian pyramid as standard python array
+    :return: Gaussian pyramid as standard python array and the filter vec
     '''
     numImInPyr = getNumInInPyr(im, max_levels)
-    gaussFilter = getGaussVec(filter_size)
+    gaussFilter = np.array(getGaussVec(filter_size)).reshape(1, filter_size)
 
     gaussPyr = [im]
     currIm = im
-
     for i in range(1, numImInPyr):
         currIm = reduceIm(currIm, gaussFilter, filter_size)
         gaussPyr.append(currIm)
@@ -160,7 +142,7 @@ def build_laplacian_pyramid(im, max_levels, filter_size):
     :param filter_size: the size of the Gaussian filter
     :return: Laplacian pyramid as standard python array and the filter vec
     '''
-    gaussFilter = getGaussVec(filter_size)
+    gaussFilter = np.array(getGaussVec(filter_size)).reshape(1, filter_size)
     laplacianPyr = []
 
     gaussPyr = build_gaussian_pyramid(im, max_levels, filter_size)[0]
@@ -276,7 +258,7 @@ def pyramid_blending(im1, im2, mask, max_levels, filter_size_im,
                     (np.multiply(1 - gaussMaskPyr[i], l2Pyr[i])))
     blendedIm = laplacian_to_image(lOut, filterVec1, [1] * lenOfPyr)
     blendedImClip = np.clip(blendedIm, 0, 1)
-    return blendedImClip
+    return blendedImClip.astype(np.float32)
 
 
 def relpath(filename):
@@ -324,7 +306,8 @@ def doMyBlend(im1Path, im2Path, maskPath):
     im1 = read_image(relpath(im1Path), 2)
     im2 = read_image(relpath(im2Path), 2)
 
-    blendedIm = np.zeros((im1.shape[0], im1.shape[1], im1.shape[2]))
+    blendedIm = np.zeros((im1.shape[0], im1.shape[1], im1.shape[2])).\
+        astype(np.float32)
     for i in range(DIM_RGB):
         blendedIm[:, :, i] = pyramid_blending(im1[:, :, i], im2[:, :, i],
                                               mask, max_levels, filter_size_im,

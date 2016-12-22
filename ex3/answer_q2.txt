@@ -1,2 +1,17 @@
 Q2:
 
+The filter size is using for the kernel that will
+be used when performing the blurring of the images.
+
+Therefore using different kernel size will create
+different blurring of the images and therefore will change
+the blending of the image.
+
+For instance if we use a small kernel size (e.g. 3), there will
+not be a lot of blurring and therefore there will be add a lot
+of noise to the pyramids and eventually to the blend image.
+
+On the other end if we use a really large kernel (e.g. 101),
+The blur will not be locally and therefore we will lose
+some of the details of the images (the high frequencies for
+instance).
