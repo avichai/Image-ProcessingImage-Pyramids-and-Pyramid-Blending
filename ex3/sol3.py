@@ -64,11 +64,15 @@ def getImAfterBlur(im, filter, filter_size):
     :return: blurred image
     '''
     # todo choose which convolve do I prefer
-    # blurXIm = convolve(im, filterAsMat, mode='reflect')
-    blurXIm = convolve(im, filter, mode='constant', cval=0.0)
-    # blurIm = convolve(blurXIm, filterAsMat.transpose(), mode='reflect')
-    blurIm = convolve(blurXIm, filter.transpose(),
-                      mode='constant', cval=0.0).astype(np.float32)
+    mode1 = 'mirror'
+    mode2 = 'reflect'
+    mode = mode2
+
+    blurXIm = convolve(im, filter, mode=mode)
+    # blurXIm = convolve(im, filter, mode='constant', cval=0.0)
+    blurIm = convolve(blurXIm, filter.transpose(), mode=mode)
+    # blurIm = convolve(blurXIm, filter.transpose(),
+    #                   mode='constant', cval=0.0).astype(np.float32)
     return blurIm
 
 
@@ -222,7 +226,9 @@ def display_pyramid(pyr, levels):
     res = render_pyramid(pyr, levels)
     plt.figure()
     plt.imshow(res, cmap=plt.cm.gray)
-    plt.show(block=True)
+    # notice that in the forum we've been asked not to use
+    # block=true
+    plt.show()
 
 
 def pyramid_blending(im1, im2, mask, max_levels, filter_size_im,
@@ -287,7 +293,9 @@ def generateFigure(im1, im2, mask, blendedIm):
     plt.imshow(mask, cmap=plt.cm.gray)
     plt.subplot(2, 2, 4)
     plt.imshow(blendedIm)
-    plt.show(block=True)
+    # notice that in the forum we've been asked not to use
+    # block=true
+    plt.show()
 
 
 def doMyBlend(im1Path, im2Path, maskPath):

@@ -49,6 +49,7 @@ def testReconstract():
     plt.imshow(img, cmap=plt.cm.gray)
 
     print(np.mean(np.abs(img - im)))
+    print(np.max(np.abs(img - im)))
     plt.show(block=True)
 
 
@@ -101,14 +102,19 @@ def testBlend():
 
 
 def testBlendExample():
+    import time as time
+    t1 = time.time()
     im1, im2, mask, im_blend = sol3.blending_example1()
+    print (time.time()-t1)
+    t2 = time.time()
     im3, im4, mask1, im_blend1 = sol3.blending_example2()
+    print(time.time() - t2)
     plt.figure()
     plt.imshow(im_blend)
     plt.figure()
     plt.imshow(im_blend1)
 
-    plt.show(block=True)
+    plt.show()
 
 
 # tests:
@@ -124,7 +130,7 @@ def testBlendExample():
 
 def main():
     try:
-        for test in [testBlendExample]:
+        for test in [testDispPyr]:
             test()
     except Exception as e:
         print("Failed test due to: {0}".format(e))
