@@ -1,11 +1,11 @@
 Q1:
 
 If we multiply with different coefficient is means that we multiply
-that we multiply the different laplacian with some value.
+the different laplacian with some value.
 
 As learned in class the laplacian in each level represent different
 frequencies. Therefore when we multiply with some coefficient
-and than adding the result to reconstruct the image we are actually
+and then adding the result to reconstruct the image we are actually
 amplifying or de amplifying certain frequencies of the image.
 
 Only when we are using all 1's coefficient we are using the same
