@@ -1,6 +1,6 @@
 Q2:
 
-The filter size is using for the kernel that will
+The filter size is used for the kernel that will
 be used when performing the blurring of the images.
 
 Therefore using different kernel size will create

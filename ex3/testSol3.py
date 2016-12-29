@@ -20,12 +20,13 @@ def testGaussPyr():
 
 
 def testLapPyr():
-    NUM_PIC = 7
+    NUM_PIC = 4
     im = sol3.read_image('external/jerusalem.jpg', 1)
     im = im[:2 ** (np.uint(np.floor(np.log2(im.shape[0])))),
          :2 ** (np.uint(np.floor(np.log2(im.shape[1]))))]
     pyr, filter_vec = sol3.build_laplacian_pyramid(im, NUM_PIC, 3)
     print(filter_vec)
+
     plt.figure()
     for i in range(len(pyr)):
         plt.subplot(1, NUM_PIC, 1 + i)
@@ -35,13 +36,17 @@ def testLapPyr():
 
 def testReconstract():
     NUM_PIC = 7
-    # im = sol3.read_image('external/jerusalem.jpg', 1)
+    im = sol3.read_image('external/jerusalem.jpg', 1)
     # im = sol3.read_image('external/monkey.jpg', 1)
-    im = sol3.read_image('external/LowContrast.jpg', 1)
+    # im = sol3.read_image('external/LowContrast.jpg', 1)
     im = im[:2 ** (np.uint(np.floor(np.log2(im.shape[0])))),
          :2 ** (np.uint(np.floor(np.log2(im.shape[1]))))]
     lpyr, filter_vec = sol3.build_laplacian_pyramid(im, NUM_PIC, 7)
     img = sol3.laplacian_to_image(lpyr, filter_vec, [1, 1, 1, 1, 1])
+
+    print(filter_vec.shape)
+    print(lpyr[4].shape)
+    print(len(lpyr))
 
     plt.figure()
     plt.imshow(im, cmap=plt.cm.gray)
@@ -63,6 +68,8 @@ def testRenderPyr():
     pyrl, filter_vec2 = sol3.build_laplacian_pyramid(im, NUM_PIC, 11)
 
     resg = sol3.render_pyramid(pyrg, len(pyrg))
+
+
     plt.figure()
     plt.imshow(resg, cmap=plt.cm.gray)
 
@@ -130,7 +137,7 @@ def testBlendExample():
 
 def main():
     try:
-        for test in [testDispPyr]:
+        for test in [testBlendExample]:
             test()
     except Exception as e:
         print("Failed test due to: {0}".format(e))

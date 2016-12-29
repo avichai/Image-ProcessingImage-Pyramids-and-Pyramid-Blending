@@ -53,26 +53,18 @@ def getGaussVec(kernel_size):
     '''
     if kernel_size == IDENTITY_KERNEL_SIZE:
         return [1]
-    return sig.convolve(BINOMIAL_MAT, getGaussVec(kernel_size - 1))
+    return sig.convolve(BINOMIAL_MAT, getGaussVec(kernel_size - 1)).astype(np.float32)
 
 
-def getImAfterBlur(im, filter, filter_size):
+def getImAfterBlur(im, filter):
     '''
     return the image after row and col blur
     :param im: the image to blur
     :param filter: the filter to blur with
     :return: blurred image
     '''
-    # todo choose which convolve do I prefer
-    mode1 = 'mirror'
-    mode2 = 'reflect'
-    mode = mode2
-
-    blurXIm = convolve(im, filter, mode=mode)
-    # blurXIm = convolve(im, filter, mode='constant', cval=0.0)
-    blurIm = convolve(blurXIm, filter.transpose(), mode=mode)
-    # blurIm = convolve(blurXIm, filter.transpose(),
-    #                   mode='constant', cval=0.0).astype(np.float32)
+    blurXIm = convolve(im, filter)
+    blurIm = convolve(blurXIm, filter.transpose())
     return blurIm
 
 
@@ -84,7 +76,7 @@ def reduceIm(currIm, gaussFilter, filter_size):
     :param filter_size: the size of the filter
     :return: the reduced image
     '''
-    blurIm = getImAfterBlur(currIm, gaussFilter, filter_size)
+    blurIm = getImAfterBlur(currIm, gaussFilter)
     reducedImage = blurIm[::2, ::2]
     return reducedImage.astype(np.float32)
 
@@ -100,7 +92,7 @@ def expandIm(currIm, gaussFilterForExpand, filter_size):
     '''
     expandImage = np.zeros((2 * currIm.shape[0], 2 * currIm.shape[1]))
     expandImage[::2, ::2] = currIm
-    expandRes = getImAfterBlur(expandImage, gaussFilterForExpand, filter_size)
+    expandRes = getImAfterBlur(expandImage, gaussFilterForExpand)
     return expandRes.astype(np.float32)
 
 
@@ -226,8 +218,6 @@ def display_pyramid(pyr, levels):
     res = render_pyramid(pyr, levels)
     plt.figure()
     plt.imshow(res, cmap=plt.cm.gray)
-    # notice that in the forum we've been asked not to use
-    # block=true
     plt.show()
 
 
@@ -293,8 +283,6 @@ def generateFigure(im1, im2, mask, blendedIm):
     plt.imshow(mask, cmap=plt.cm.gray)
     plt.subplot(2, 2, 4)
     plt.imshow(blendedIm)
-    # notice that in the forum we've been asked not to use
-    # block=true
     plt.show()
 
 

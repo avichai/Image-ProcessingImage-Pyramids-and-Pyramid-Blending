@@ -6,5 +6,5 @@ levels there will be at each pyramid (at most if possible).
 Therefore using larger max_level will create larger pyramids
 which mean the blending will be done in more levels.
 
-We can aspect better results of blending when using more levels
+We can expect better results of blending when using more levels
 (In the aspect of blending of the connection points between the 2 images).
